@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpSession;
+
 @RestController
 public class UserApiController {
 
@@ -22,9 +24,17 @@ public class UserApiController {
 
     @PostMapping("/api/user")
     public ResponseEntity<Integer> save(@RequestBody User user){
-        System.out.println("save호출");
         user.setRole(RoleType.USER);
         userService.memberJoin(user);
+        return new ResponseEntity<>(1, HttpStatus.OK);
+    }
+
+    @PostMapping("/api/user/login")
+    public ResponseEntity<Integer> login(@RequestBody User user, HttpSession session) {
+        User principal = userService.memberLogin(user);
+        if(principal != null) {
+            session.setAttribute("principal", principal);
+        }
         return new ResponseEntity<>(1, HttpStatus.OK);
     }
 }
